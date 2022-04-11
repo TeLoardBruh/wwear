@@ -10,6 +10,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import datetime, timedelta
 from jose import jwt
 import os
+from bson.objectid import ObjectId
 from dotenv import load_dotenv, find_dotenv
 
 # loads env
@@ -35,6 +36,21 @@ async def create_post_item(file: UploadFile, item: Optional[str] = None,token: s
         return {"info": f"file '{file.filename}' saved at '{file_location}'"}
     else: 
         return False
+
+@item.delete('/api/item/deleteItem')
+async def delete_post_item(id, token: str = Depends(oauth2_scheme)):
+    existItem = client.wwear.item.find_one({"_id": ObjectId(id)})
+    if existItem:
+        decode_jwt = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
+        user = client.wwear.user.find_one({"userName": decode_jwt["sub"]})
+        ownerItem = client.wwear.item.find_one({"_id": ObjectId(id), "userId": ObjectId(user["_id"])})
+        if not ownerItem:
+            return {"message : Item not found"}
+        else:
+            client.wwear.item.delete_one({"_id": ObjectId(id)})
+            return {"message : Delete successfully"}
+    else:
+        return {"message : Item not found"}
 
 
 @item.get('/api/items')
