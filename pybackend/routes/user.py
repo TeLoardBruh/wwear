@@ -3,6 +3,7 @@ from typing import Optional
 from models.user import User
 from config.db import client,db
 from schemas.user import userEntity, usersEntity
+from utils import currentUser
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 import json
@@ -71,5 +72,5 @@ async def login(formData: OAuth2PasswordRequestForm = Depends()):
 
 @user.get('/api/user/me')
 async def getMe(token: str = Depends(oauth2_scheme)):
-    test = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
-    return {"token": token, "test": test['sub']}
+    user = currentUser(token)
+    return {"token": token, "user": user}
