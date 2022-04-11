@@ -10,16 +10,12 @@ from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import datetime, timedelta
 from jose import jwt
-import os
 from bson.objectid import ObjectId
 from dotenv import load_dotenv, find_dotenv
 
 # loads env
 load_dotenv(find_dotenv())
 
-
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = os.getenv("ALGORITHM")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 item = APIRouter()
